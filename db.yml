@@ -1,0 +1,22 @@
+- hosts: node02
+  tasks:
+    - name: start serv
+      service:
+        name: ngnix, mariadb
+        state: started
+
+    - name: delete files
+      shell: rm -rf /usr/share/nginx/html
+    - name: zip git repo
+      git:
+        repo: https://github.com/indercodes/ansible-1100-mock-nginx/raw/master/index.php.zip
+        dest: /usr/share/nginx/html/
+    - name: replace module
+      lineinfile:
+        path: /usr/share/nginx/html/index.php
+        regxep: "{{ item.regexp }}"
+        replace: "{{ item.replace }}"
+      loop:
+        - { regexp: '$database = "database";', replace: '$database = "mydb";'}
+        - { regexp: '$username = "user";', replace: '$username = "myuser";'}
+        - { regexp: '$password = "password";', replace: '$password = "mypassword";'}
